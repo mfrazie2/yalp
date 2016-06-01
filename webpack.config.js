@@ -68,8 +68,9 @@ cssLoader.loader = newLoader.loader;
 config.module.loaders.push({
   test: /\.css$/,
   include: [modules],
-  loader: 'styles!css'
+  loader: 'style!css'
 });
+
 // Post CSS
 config.postcss = [].concat([
   require('precss')({}),

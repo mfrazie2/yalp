@@ -1,3 +1,4 @@
+require('babel-register');
 // Dev Environment
 const NODE_ENV = process.env.NODE_ENV;
 const dotenv = require('dotenv')
@@ -10,6 +11,7 @@ const path = require('path'),
 const getConfig = require('hjs-webpack');
 
 const isDev = (NODE_ENV === 'development');
+const isTest = (NODE_ENV === 'test');
 
 // Path Variables
 const root = resolve(__dirname);
@@ -17,12 +19,41 @@ const src = join(root, 'src');
 const modules = join(root, 'node_modules');
 const dest = join(root, 'dist');
 
+// Config
 var config = getConfig({
   isDev: isDev,
   in: join(src, 'app.js'),
   out: dest,
   clearBeforeBuild: true
 });
+
+if (isTest) {
+  config.externals = {
+    'react/lib/ReactContext': true,
+    'react/lib/ExecutionEnvironment': true,
+    'react/addons': true
+  };
+  
+  config.plugins = config.plugins.filter(p => {
+    const name = p.constructor.toString();
+    const fnName = name.match(/^function (.*)\((.*\))/);
+    const idx = [
+      'DedupePlugin',
+      'UglifyJsPlugin'
+    ].indexOf(fnName[1]);
+    return idx < 0;
+  });
+}
+
+
+// Route Aliases
+config.resolve.root = [src, modules];
+config.resolve.alias = {
+  'css': join(src, 'styles'),
+  'containers': join(src, 'containers'),
+  'components': join(src, 'components'),
+  'utils': join(src, 'utils')
+};
 
 // ENV variables
 const dotEnvVars = dotenv.config();

@@ -1,10 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router'
+import styles from './styles.module.css'
 
 export class Header extends React.Component {
   render () {
     return (
-      <div>
+      <div className={styles.topbar}>
         <Link to='/'><h1>Yalp</h1></Link>
         <section>yalp.xyz</section>
       </div>
